@@ -1,8 +1,24 @@
-// ================= IMAGE LOAD =================
+// ================= IMAGE =================
 const img = document.getElementById("resultImage");
 const stored = localStorage.getItem("uploadedImage");
 
 if (stored) img.src = stored;
+
+// ================= RESULT DATA =================
+const result = JSON.parse(localStorage.getItem("analysisResult"));
+
+if (result) {
+  const score = Math.round(result.overall_score * 100);
+
+  document.getElementById("scoreValue").textContent = score + "%";
+
+  document.querySelector(".risk-badge").textContent = result.verdict;
+
+  document.querySelector(".desc").textContent = result.summary;
+
+  document.querySelector(".panel-header.green p").textContent =
+    result.detections.length + " anomalies detected";
+}
 
 // ================= ZOOM =================
 let scale = 1;
@@ -47,7 +63,6 @@ window.addEventListener("mouseup", () => isDragging = false);
 
 window.addEventListener("mousemove", (e) => {
   if (!isDragging) return;
-
   posX = e.clientX - startX;
   posY = e.clientY - startY;
   updateTransform();
@@ -72,22 +87,25 @@ slider.addEventListener("input", () => {
   });
 });
 
-// ================= SCORE =================
-const scoreEl = document.getElementById("scoreValue");
-let score = 0;
+// ================= HEATMAP (OPTIONAL COOL FEATURE) =================
+if (result && result.heatmap_b64) {
+  const heatmap = document.createElement("img");
+  heatmap.src = "data:image/png;base64," + result.heatmap_b64;
+  heatmap.style.width = "100%";
+  heatmap.style.marginTop = "10px";
 
-const interval = setInterval(() => {
-  score++;
-  scoreEl.textContent = score + "%";
-  if (score >= 95) clearInterval(interval);
-}, 15);
+  document.querySelector(".preview-panel").appendChild(heatmap);
+}
 
 // ================= DOWNLOAD =================
 document.querySelector(".download-btn").onclick = () => {
-  const blob = new Blob(["Fake AI Report"], { type: "text/plain" });
+  const blob = new Blob([JSON.stringify(result, null, 2)], {
+    type: "application/json"
+  });
+
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "report.txt";
+  link.download = "report.json";
   link.click();
 };
 
