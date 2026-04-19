@@ -36,7 +36,7 @@ const interval = setInterval(() => {
     // next page later
     setTimeout(() => {
       alert("Analysis Complete (connect backend here)");
-      window.location.href = "results.html";
+      window.location.href = "result.html";
     }, 500);
   }
 }, 100);
