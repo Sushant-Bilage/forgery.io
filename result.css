@@ -10,6 +10,7 @@ body {
   padding: 20px;
 }
 
+/* HEADER */
 .header-inner {
   display: flex;
   justify-content: space-between;
@@ -36,6 +37,7 @@ body {
 .step {
   padding: 6px 12px;
   border-radius: 8px;
+  font-size: 14px;
 }
 
 .active {
@@ -60,6 +62,7 @@ body {
   background: white;
   border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
 .panel-header {
@@ -72,14 +75,21 @@ body {
   background: #0F766E;
 }
 
-.image-container {
+/* IMAGE */
+.image-wrapper {
   position: relative;
   padding: 20px;
   text-align: center;
 }
 
-.image-container img {
+.image-wrapper img {
   max-width: 100%;
+  border-radius: 10px;
+  cursor: grab;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
 
 /* TAGS */
@@ -109,17 +119,21 @@ body {
   margin: auto;
   font-size: 24px;
   font-weight: bold;
-  color: red;
+  transition: all 0.4s ease;
 }
 
-.risk {
-  color: red;
+.risk-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
   margin-top: 10px;
 }
 
 .desc {
   font-size: 14px;
   color: #555;
+  margin-top: 10px;
 }
 
 /* CONTROLS */
@@ -142,6 +156,7 @@ body {
   color: white;
   border: none;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 .new-btn {
@@ -152,9 +167,11 @@ body {
   border: 1px solid #ccc;
   background: white;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 footer {
   text-align: center;
   margin-top: 20px;
+  color: #666;
 }
