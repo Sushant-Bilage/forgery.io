@@ -4,13 +4,13 @@ const stored = localStorage.getItem("uploadedImage");
 
 if (stored) img.src = stored;
 
-// ================= SCORE LOGIC =================
+// ================= SCORE =================
 const scoreEl = document.getElementById("scoreValue");
 const badge = document.querySelector(".risk-badge");
 const desc = document.querySelector(".desc");
 const circle = document.querySelector(".circle");
 
-// 👉 Replace this later with real backend value if needed
+// 👉 Replace with real backend later
 let score = Math.floor(Math.random() * 100);
 
 // animate score
@@ -25,31 +25,37 @@ const interval = setInterval(() => {
 // 🎨 COLOR LOGIC
 if (score < 25) {
   // GREEN
-  circle.style.border = "8px solid #16a34a";
-  circle.style.boxShadow = "0 0 20px rgba(22,163,74,0.3)";
+  circle.style.border = "10px solid #16a34a";
+  circle.style.color = "#16a34a";
+
   badge.textContent = "Low Risk";
   badge.style.background = "#dcfce7";
   badge.style.color = "#166534";
+
   desc.textContent =
-    "Document appears genuine. No significant tampering detected.";
+    "Document appears genuine. No major tampering detected.";
 }
 else if (score < 50) {
   // ORANGE
-  circle.style.border = "8px solid #f59e0b";
-  circle.style.boxShadow = "0 0 20px rgba(245,158,11,0.3)";
+  circle.style.border = "10px solid #f59e0b";
+  circle.style.color = "#f59e0b";
+
   badge.textContent = "Moderate Risk";
   badge.style.background = "#fef3c7";
   badge.style.color = "#92400e";
+
   desc.textContent =
-    "Some inconsistencies detected. Manual verification recommended.";
+    "Some inconsistencies detected. Please verify manually.";
 }
 else {
   // RED
-  circle.style.border = "8px solid #dc2626";
-  circle.style.boxShadow = "0 0 20px rgba(220,38,38,0.3)";
+  circle.style.border = "10px solid #dc2626";
+  circle.style.color = "#dc2626";
+
   badge.textContent = "Critical Risk";
   badge.style.background = "#fee2e2";
   badge.style.color = "#991b1b";
+
   desc.textContent =
     "Strong evidence of document manipulation detected.";
 }
@@ -122,9 +128,14 @@ slider.addEventListener("input", () => {
   });
 });
 
-// ================= DOWNLOAD (PDF) =================
+// ================= DOWNLOAD PDF =================
 document.querySelector(".download-btn").onclick = async () => {
   const fileData = localStorage.getItem("uploadedImage");
+
+  if (!fileData) {
+    alert("No image found");
+    return;
+  }
 
   try {
     const res = await fetch(fileData);
@@ -140,6 +151,10 @@ document.querySelector(".download-btn").onclick = async () => {
         body: blob
       }
     );
+
+    if (!response.ok) {
+      throw new Error("Server error");
+    }
 
     const pdfBlob = await response.blob();
 
