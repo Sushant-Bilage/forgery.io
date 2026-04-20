@@ -15,42 +15,55 @@ const steps = [
   "Checking metadata...",
   "Detecting manipulation...",
   "Running AI model...",
-  "Finalizing results..."
+  "Generating PDF report..."
 ];
 
 let progressValue = 0;
 let stepIndex = 0;
 
-// 🔥 SEND TO BACKEND
+// 🔥 SEND TO BACKEND (PDF VERSION)
 async function sendToBackend() {
   try {
+    // wake backend (important for Render free tier)
+    statusText.textContent = "Connecting to AI server...";
+    
     const res = await fetch(fileData);
     const blob = await res.blob();
 
     const response = await fetch(
-      "https://forgery-backend.onrender.com/detect",
+      "https://forgery-backendnew.onrender.com/detect", // ✅ your new backend
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/octet-stream",
-          "X-Filename": "document.jpg"
+          "Content-Type": "application/octet-stream"
         },
         body: blob
       }
     );
 
-    const result = await response.json();
+    if (!response.ok) {
+      throw new Error("Server error");
+    }
 
-    console.log("AI Result:", result);
+    // ✅ RECEIVE PDF
+    const pdfBlob = await response.blob();
 
-    // store result
-    localStorage.setItem("analysisResult", JSON.stringify(result));
+    // ✅ DOWNLOAD PDF
+    const url = window.URL.createObjectURL(pdfBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "forgery-report.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
-    window.location.href = "result.html";
+    // optional: go back or show message
+    statusText.textContent = "Download complete ✅";
 
   } catch (err) {
-    console.error(err);
-    alert("Error connecting to backend");
+    console.error("ERROR:", err);
+
+    alert("Server is waking up... please wait 30 seconds and try again");
   }
 }
 
@@ -66,6 +79,6 @@ const interval = setInterval(() => {
 
   if (progressValue >= 100) {
     clearInterval(interval);
-    sendToBackend(); // 🔥 REAL AI CALL
+    sendToBackend(); // 🔥 CALL BACKEND
   }
 }, 100);
