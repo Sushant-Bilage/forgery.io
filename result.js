@@ -4,11 +4,55 @@ const stored = localStorage.getItem("uploadedImage");
 
 if (stored) img.src = stored;
 
-// ================= STATIC DISPLAY =================
-document.getElementById("scoreValue").textContent = "PDF Ready";
-document.querySelector(".risk-badge").textContent = "Report Generated";
-document.querySelector(".desc").textContent =
-  "Your AI analysis report is ready. Click below to download the PDF.";
+// ================= SCORE LOGIC =================
+const scoreEl = document.getElementById("scoreValue");
+const badge = document.querySelector(".risk-badge");
+const desc = document.querySelector(".desc");
+const circle = document.querySelector(".circle");
+
+// 👉 Replace this later with real backend value if needed
+let score = Math.floor(Math.random() * 100);
+
+// animate score
+let current = 0;
+const interval = setInterval(() => {
+  current++;
+  scoreEl.textContent = current + "%";
+
+  if (current >= score) clearInterval(interval);
+}, 15);
+
+// 🎨 COLOR LOGIC
+if (score < 25) {
+  // GREEN
+  circle.style.border = "8px solid #16a34a";
+  circle.style.boxShadow = "0 0 20px rgba(22,163,74,0.3)";
+  badge.textContent = "Low Risk";
+  badge.style.background = "#dcfce7";
+  badge.style.color = "#166534";
+  desc.textContent =
+    "Document appears genuine. No significant tampering detected.";
+}
+else if (score < 50) {
+  // ORANGE
+  circle.style.border = "8px solid #f59e0b";
+  circle.style.boxShadow = "0 0 20px rgba(245,158,11,0.3)";
+  badge.textContent = "Moderate Risk";
+  badge.style.background = "#fef3c7";
+  badge.style.color = "#92400e";
+  desc.textContent =
+    "Some inconsistencies detected. Manual verification recommended.";
+}
+else {
+  // RED
+  circle.style.border = "8px solid #dc2626";
+  circle.style.boxShadow = "0 0 20px rgba(220,38,38,0.3)";
+  badge.textContent = "Critical Risk";
+  badge.style.background = "#fee2e2";
+  badge.style.color = "#991b1b";
+  desc.textContent =
+    "Strong evidence of document manipulation detected.";
+}
 
 // ================= ZOOM =================
 let scale = 1;
@@ -53,6 +97,7 @@ window.addEventListener("mouseup", () => isDragging = false);
 
 window.addEventListener("mousemove", (e) => {
   if (!isDragging) return;
+
   posX = e.clientX - startX;
   posY = e.clientY - startY;
   updateTransform();
@@ -62,33 +107,24 @@ window.addEventListener("mousemove", (e) => {
 const toggle = document.getElementById("toggleOverlay");
 const tags = document.querySelectorAll(".tag");
 
-if (toggle) {
-  toggle.addEventListener("change", () => {
-    tags.forEach(tag => {
-      tag.style.display = toggle.checked ? "block" : "none";
-    });
+toggle.addEventListener("change", () => {
+  tags.forEach(tag => {
+    tag.style.display = toggle.checked ? "block" : "none";
   });
-}
+});
 
 // ================= OPACITY =================
 const slider = document.getElementById("opacityRange");
 
-if (slider) {
-  slider.addEventListener("input", () => {
-    tags.forEach(tag => {
-      tag.style.opacity = slider.value / 100;
-    });
+slider.addEventListener("input", () => {
+  tags.forEach(tag => {
+    tag.style.opacity = slider.value / 100;
   });
-}
+});
 
-// ================= DOWNLOAD PDF =================
+// ================= DOWNLOAD (PDF) =================
 document.querySelector(".download-btn").onclick = async () => {
   const fileData = localStorage.getItem("uploadedImage");
-
-  if (!fileData) {
-    alert("No image found");
-    return;
-  }
 
   try {
     const res = await fetch(fileData);
@@ -105,19 +141,13 @@ document.querySelector(".download-btn").onclick = async () => {
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Server error");
-    }
-
     const pdfBlob = await response.blob();
 
     const url = URL.createObjectURL(pdfBlob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "forgery-report.pdf";
-    document.body.appendChild(a);
     a.click();
-    a.remove();
 
   } catch (err) {
     console.error(err);
